@@ -1,0 +1,21 @@
+{
+  "name": "Land Sourcing Group",
+  "short_name": "LSG",
+  "description": "Premium US Land Acquisition Services - Get a fair cash offer for your land today.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#16a34a",
+  "icons": [
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

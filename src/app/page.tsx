@@ -1,8 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import dynamic from "next/dynamic"
+import { Metadata } from "next"
 import Image from "next/image"
+import dynamic from "next/dynamic"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -11,7 +12,12 @@ import { toast } from "sonner"
 import { Flag } from "lucide-react"
 
 const LandForm = dynamic(
-  () => import("../components/land-form"),
+  () => import("@/components/land-form"),
+  { ssr: false }
+)
+
+const ChatWindow = dynamic(
+  () => import("@/components/chat/chat-window").then(mod => mod.ChatWindow),
   { ssr: false }
 )
 
@@ -32,25 +38,42 @@ export default function Home() {
       <main className="relative z-10 min-h-screen px-4 py-8 md:py-12">
         <div className="max-w-6xl mx-auto space-y-8">
           {/* Title Card */}
-          <Card className="bg-gradient-to-r from-green-900/90 to-green-800/90 backdrop-blur-sm border-none shadow-2xl p-3">
-            <div className="border border-green-600/30 rounded-lg p-2">
-              <CardHeader className="flex flex-row items-center justify-start space-x-8 pl-4 pr-8 py-6">
-                <div className="relative w-64 h-48 md:w-96 md:h-72">
-                  <Image
-                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Land_dots-A46GQywiVpnmwAGb1MihmEBk6c26pv.png"
-                    alt="USA network map logo"
-                    fill
-                    className="object-contain drop-shadow-[0_0_8px_rgba(0,0,0,0.5)]"
-                    priority
-                  />
-                </div>
-                <div className="space-y-2 text-left">
-                  <CardTitle className="text-4xl md:text-5xl font-bold text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)] [text-shadow:_0_2px_10px_rgba(0,0,0,0.7),_0_0_30px_rgba(0,0,0,0.5)]">
+          <Card className="relative overflow-hidden">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#1a472a] to-[#2a573a]"></div>
+            <div className="absolute inset-[12px] bg-gradient-to-br from-green-200/20 to-transparent rounded-lg"></div>
+            <div className="absolute inset-[12px] rounded-lg border-2 border-green-200/30 shadow-[inset_0_0_15px_rgba(134,239,172,0.15)]"></div>
+            <div className="relative z-10 flex flex-col lg:flex-row items-center gap-6 p-8">
+              <div className="relative w-72 h-72 md:w-[400px] md:h-[400px] flex-shrink-0">
+                <div 
+                  className="absolute inset-0 bg-black/40 blur-2xl [mask-image:url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Land_dots-A46GQywiVpnmwAGb1MihmEBk6c26pv.png')] [mask-size:contain] [mask-repeat:no-repeat] [mask-position:center] scale-110"
+                  style={{ maskImage: "url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Land_dots-A46GQywiVpnmwAGb1MihmEBk6c26pv.png')" }}
+                ></div>
+                <div 
+                  className="absolute inset-0 bg-[#1a472a]/50 blur-xl scale-105 [mask-image:url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Land_dots-A46GQywiVpnmwAGb1MihmEBk6c26pv.png')] [mask-size:contain] [mask-repeat:no-repeat] [mask-position:center]"
+                  style={{ maskImage: "url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Land_dots-A46GQywiVpnmwAGb1MihmEBk6c26pv.png')" }}
+                ></div>
+                <Image
+                  src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Land_dots-A46GQywiVpnmwAGb1MihmEBk6c26pv.png"
+                  alt="USA network map logo"
+                  fill
+                  className="object-contain drop-shadow-[0_0_15px_rgba(0,0,0,0.35)]"
+                  priority
+                />
+              </div>
+              <div className="flex flex-col gap-4 text-center lg:text-left">
+                <div>
+                  <h1 className="text-5xl md:text-6xl font-bold tracking-tight text-white mb-3 drop-shadow-[0_5px_25px_rgba(0,0,0,0.8)] [text-shadow:_0_2px_10px_rgba(0,0,0,0.8),_0_0_30px_rgba(0,0,0,0.6)]">
                     Land Sourcing Group
-                  </CardTitle>
-                  <p className="text-green-300/80 text-base md:text-lg">Premium US Land Acquisition Services</p>
+                  </h1>
+                  <p className="text-2xl md:text-3xl text-green-200 drop-shadow-[0_5px_20px_rgba(0,0,0,0.7)] [text-shadow:_0_2px_8px_rgba(0,0,0,0.7)]">
+                    Premium US Land Acquisition Services
+                  </p>
                 </div>
-              </CardHeader>
+                <p className="text-lg text-green-100 max-w-2xl drop-shadow-[0_2px_10px_rgba(0,0,0,0.6)] [text-shadow:_0_1px_5px_rgba(0,0,0,0.6)]">
+                  We specialize in acquiring premium land properties across the United States,
+                  offering competitive prices and a seamless selling experience.
+                </p>
+              </div>
             </div>
           </Card>
 
@@ -76,6 +99,9 @@ export default function Home() {
                       <p className="text-lg text-center">
                         Enter your property details for a quick cash offer on your land!
                       </p>
+                      <div className="mt-8">
+                        <ChatWindow />
+                      </div>
                     </div>
                   </div>
 
