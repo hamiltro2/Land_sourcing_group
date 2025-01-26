@@ -7,6 +7,15 @@ export async function POST(req: Request) {
     const body = await req.json()
     const { message, messages = [] } = body
 
+    // Validate API key
+    if (!process.env.DEEPSEEK_API_KEY) {
+      console.error("Deepseek API key not found")
+      return NextResponse.json(
+        { error: "API configuration error" },
+        { status: 500 }
+      )
+    }
+
     // Format messages for Deepseek
     const formattedMessages = [
       {
@@ -149,17 +158,26 @@ Always Remember:
     })
 
     if (!response.ok) {
-      throw new Error(`Deepseek API error: ${response.status}`)
+      const errorData = await response.json().catch(() => ({}))
+      console.error("Deepseek API error:", {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorData
+      })
+      throw new Error(`Deepseek API error: ${response.status} - ${response.statusText}`)
     }
 
     const data = await response.json()
-    const reply = data.choices[0]?.message?.content || "I'm having trouble responding right now."
+    if (!data.choices?.[0]?.message?.content) {
+      console.error("Unexpected Deepseek response format:", data)
+      throw new Error("Invalid response format from Deepseek")
+    }
 
-    return NextResponse.json({ message: reply })
+    return NextResponse.json({ message: data.choices[0].message.content })
   } catch (error) {
     console.error("Chat API Error:", error)
     return NextResponse.json(
-      { error: "Failed to process your request" },
+      { error: "Failed to process your request. Please try again." },
       { status: 500 }
     )
   }
