@@ -19,7 +19,7 @@ export function ChatWindow() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "Hi! I'm your Land Assistant from Land Sourcing Group. I can help you estimate your property's value and answer any questions about selling your land. What would you like to know?",
+      content: "Hi! I'm your Land Assistant from Land Sourcing Group. Do you need help getting a sense of a fair cash offer? Call us at (407) 284-8192 or submit your land details through our form so we can analyze your property.",
     },
   ])
   const [input, setInput] = useState("")
@@ -161,8 +161,34 @@ export function ChatWindow() {
                         : "bg-green-600 text-white"
                     )}
                   >
-                    <div className="prose prose-sm">
-                      {message.content}
+                    <div className={cn(
+                      "prose prose-sm",
+                      message.role === "assistant" && "prose-ul:pl-5 prose-ul:mt-2 prose-ul:space-y-1 prose-li:pl-0 prose-li:my-0",
+                      message.role === "assistant" && "prose-ol:pl-5 prose-ol:mt-2 prose-ol:space-y-1 prose-ol:list-decimal prose-li:pl-0 prose-li:my-0"
+                    )}>
+                      {message.content.split('\n').map((line, i) => {
+                        // Check for bullet points
+                        if (line.trim().startsWith('•')) {
+                          return <div key={i} className="flex items-start space-x-2 my-1">
+                            <span className="text-green-600 mt-0.5">•</span>
+                            <span>{line.trim().substring(1).trim()}</span>
+                          </div>
+                        }
+                        // Check for numbered lists (e.g., "1.", "2.", etc.)
+                        else if (/^\d+\./.test(line.trim())) {
+                          const [number, ...rest] = line.trim().split('.')
+                          return <div key={i} className="flex items-start space-x-2 my-1">
+                            <span className="text-green-600 font-semibold min-w-[1.5rem]">{number}.</span>
+                            <span>{rest.join('.').trim()}</span>
+                          </div>
+                        }
+                        // Regular text
+                        else if (line.trim()) {
+                          return <p key={i} className="my-1">{line}</p>
+                        }
+                        // Empty lines
+                        return <p key={i} className="my-2"></p>
+                      })}
                     </div>
                   </div>
                 </div>
