@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -13,6 +13,8 @@ interface Message {
   content: string
 }
 
+const INACTIVITY_TIMEOUT = 15 * 60 * 1000; // 15 minutes in milliseconds
+
 export function ChatWindow() {
   const [messages, setMessages] = useState<Message[]>([
     {
@@ -23,6 +25,43 @@ export function ChatWindow() {
   const [input, setInput] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [isExpanded, setIsExpanded] = useState(true)
+  const lastActivityTime = useRef<number>(Date.now())
+  const refreshTimeout = useRef<NodeJS.Timeout>()
+
+  // Function to check inactivity and refresh if needed
+  const checkInactivity = () => {
+    const currentTime = Date.now()
+    if (currentTime - lastActivityTime.current >= INACTIVITY_TIMEOUT) {
+      window.location.reload()
+    }
+  }
+
+  // Update last activity time on user interactions
+  const updateLastActivity = () => {
+    lastActivityTime.current = Date.now()
+  }
+
+  // Set up activity monitoring
+  useEffect(() => {
+    // Set up periodic check for inactivity
+    refreshTimeout.current = setInterval(checkInactivity, 60000) // Check every minute
+
+    // Set up event listeners for user activity
+    const events = ['mousedown', 'keydown', 'scroll', 'touchstart']
+    events.forEach(event => {
+      window.addEventListener(event, updateLastActivity)
+    })
+
+    // Cleanup
+    return () => {
+      if (refreshTimeout.current) {
+        clearInterval(refreshTimeout.current)
+      }
+      events.forEach(event => {
+        window.removeEventListener(event, updateLastActivity)
+      })
+    }
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -31,6 +70,7 @@ export function ChatWindow() {
 
     setInput("")
     setIsLoading(true)
+    updateLastActivity()
 
     // Add user message to chat
     setMessages((prev) => [...prev, { role: "user", content: userMessage }])
@@ -63,6 +103,7 @@ export function ChatWindow() {
 
   const toggleExpand = () => {
     setIsExpanded(!isExpanded)
+    updateLastActivity()
   }
 
   return (
