@@ -19,7 +19,7 @@ export function ChatWindow() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "Hi! I'm your Land Assistant from Land Sourcing Group. Do you need help getting a sense of a fair cash offer? Call us at (407) 284-8192 or submit your land details through our form so we can analyze your property.",
+      content: "Hi! I'm your Land Assistant from Land Sourcing Group. Do you need help getting a fair cash offer for your land quickly? Call us at (407) 284-8192 or submit your land details through our form so we can analyze your property.",
     },
   ])
   const [input, setInput] = useState("")
