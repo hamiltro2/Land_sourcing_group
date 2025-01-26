@@ -16,7 +16,7 @@ export function ChatWindow() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: "Hi! I'm your Land Value Assistant from Land Sourcing Group. I can help you estimate your property's value and answer any questions about selling your land. What would you like to know?",
+      content: "Hi! I'm your Land Assistant from Land Sourcing Group. I can help you estimate your property's value and answer any questions about selling your land. What would you like to know?",
     },
   ])
   const [input, setInput] = useState("")
@@ -70,7 +70,7 @@ export function ChatWindow() {
             <MessageCircle className="h-6 w-6 text-green-200" />
             <div className="flex flex-col">
               <CardTitle className="text-2xl font-bold text-white tracking-tight">
-                Land Value Assistant
+                Land Assistant
               </CardTitle>
               <span className="text-sm font-medium text-green-200 tracking-wide uppercase">
                 Land Sourcing Group
@@ -100,36 +100,57 @@ export function ChatWindow() {
                 <div
                   className={`max-w-[80%] rounded-lg px-4 py-2 ${
                     message.role === "assistant"
-                      ? "bg-green-100 text-green-900"
-                      : "bg-[#1a472a] text-white"
+                      ? "bg-green-700/90 text-white"
+                      : "bg-white/90 text-gray-800 ml-auto"
                   }`}
                 >
-                  {message.content}
+                  {message.role === "assistant" && (
+                    <div className="flex items-center gap-2 mb-1 text-green-200 text-sm">
+                      <MessageCircle className="h-4 w-4" />
+                      <span>Land Assistant</span>
+                    </div>
+                  )}
+                  {isLoading && message === messages[messages.length - 1] ? (
+                    <div className="flex items-center gap-2">
+                      <span className="animate-pulse">●</span>
+                      <span className="animate-pulse animation-delay-200">●</span>
+                      <span className="animate-pulse animation-delay-400">●</span>
+                    </div>
+                  ) : (
+                    <div className="prose prose-sm max-w-none">
+                      {message.content.split('\n').map((line, i) => (
+                        <p key={i} className={message.role === "assistant" ? "text-white/90" : "text-gray-800"}>
+                          {line}
+                        </p>
+                      ))}
+                    </div>
+                  )}
+                  <div className="text-xs mt-1 opacity-50">
+                    {new Date().toLocaleTimeString()}
+                  </div>
                 </div>
               </div>
             ))}
-            {isLoading && (
-              <div className="flex justify-start">
-                <div className="bg-green-100 rounded-lg px-4 py-2">
-                  <Spinner className="text-[#1a472a] h-4 w-4" />
-                </div>
-              </div>
-            )}
           </div>
-          <form onSubmit={handleSubmit} className="flex gap-2">
+
+          <form onSubmit={handleSubmit} className="mt-4 flex gap-2">
             <Input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask about your property value..."
-              className="flex-1 bg-white/90 border-0 focus-visible:ring-green-200"
+              placeholder="Ask about selling your land..."
+              className="flex-1 bg-white/95 border-green-600/20 focus:border-green-600/40 focus:ring-green-600/40"
               disabled={isLoading}
             />
             <Button 
-              type="submit" 
-              disabled={isLoading}
-              className="bg-white text-[#1a472a] hover:bg-green-100"
+              type="submit"
+              disabled={isLoading || !input.trim()}
+              className="bg-green-600 hover:bg-green-700 text-white disabled:opacity-50"
             >
-              Send
+              {isLoading ? (
+                <Spinner className="h-4 w-4" />
+              ) : (
+                "Send"
+              )}
             </Button>
           </form>
         </div>
