@@ -310,6 +310,10 @@ export default function Home() {
             <div className="border border-green-600/20 rounded-lg p-2">
               <CardHeader>
                 <CardTitle className="text-2xl text-center text-green-800">Contact Us Today to Get Started</CardTitle>
+                <div className="flex items-center justify-center gap-2 text-green-700 mt-2">
+                  <Phone className="h-5 w-5" />
+                  <a href="tel:407-284-8192" className="text-lg hover:text-green-600 transition-colors">(407) 284-8192</a>
+                </div>
               </CardHeader>
               <CardContent className="text-center p-8">
                 <p className="text-green-700 mb-6">
