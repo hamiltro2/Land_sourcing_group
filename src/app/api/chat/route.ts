@@ -4,7 +4,8 @@ const DEEPSEEK_API_URL = "https://api.deepseek.com/chat/completions"
 
 export async function POST(req: Request) {
   try {
-    const { message, messages } = await req.json()
+    const body = await req.json()
+    const { message, messages = [] } = body
 
     // Format messages for Deepseek
     const formattedMessages = [

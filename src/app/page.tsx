@@ -7,17 +7,20 @@ import dynamic from "next/dynamic"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
+import { cn } from "@/lib/utils"
+import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { toast } from "sonner"
-import { Flag } from "lucide-react"
-
-const LandForm = dynamic(
-  () => import("@/components/land-form"),
-  { ssr: false }
-)
+import { Flag, Phone } from "lucide-react"
 
 const ChatWindow = dynamic(
   () => import("@/components/chat/chat-window").then(mod => mod.ChatWindow),
+  { ssr: false }
+)
+
+const LandForm = dynamic(
+  () => import("@/components/land-form"),
   { ssr: false }
 )
 
@@ -43,6 +46,20 @@ export default function Home() {
             <div className="absolute inset-[12px] bg-gradient-to-br from-green-200/20 to-transparent rounded-lg"></div>
             <div className="absolute inset-[12px] rounded-lg border-2 border-green-200/30 shadow-[inset_0_0_15px_rgba(134,239,172,0.15)]"></div>
             <div className="relative z-10 flex flex-col lg:flex-row items-center gap-6 p-8">
+              <div className="flex flex-col gap-4 text-center lg:text-left lg:ml-12">
+                <div>
+                  <h1 className="text-5xl md:text-6xl font-bold tracking-tight text-white mb-3 drop-shadow-[0_5px_25px_rgba(0,0,0,0.8)] [text-shadow:_0_2px_10px_rgba(0,0,0,0.8),_0_0_30px_rgba(0,0,0,0.6)]">
+                    Land Sourcing Group
+                  </h1>
+                  <p className="text-2xl md:text-3xl text-green-200 drop-shadow-[0_5px_20px_rgba(0,0,0,0.7)] [text-shadow:_0_2px_8px_rgba(0,0,0,0.7)]">
+                    Premium US Land Acquisition Services
+                  </p>
+                </div>
+                <p className="text-lg text-green-100 max-w-2xl drop-shadow-[0_2px_10px_rgba(0,0,0,0.6)] [text-shadow:_0_1px_5px_rgba(0,0,0,0.6)]">
+                  We specialize in acquiring premium land properties across the United States,
+                  offering competitive prices and a seamless selling experience.
+                </p>
+              </div>
               <div className="relative w-72 h-72 md:w-[400px] md:h-[400px] flex-shrink-0">
                 <div 
                   className="absolute inset-0 bg-black/40 blur-2xl [mask-image:url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Land_dots-A46GQywiVpnmwAGb1MihmEBk6c26pv.png')] [mask-size:contain] [mask-repeat:no-repeat] [mask-position:center] scale-110"
@@ -59,20 +76,6 @@ export default function Home() {
                   className="object-contain drop-shadow-[0_0_15px_rgba(0,0,0,0.35)]"
                   priority
                 />
-              </div>
-              <div className="flex flex-col gap-4 text-center lg:text-left">
-                <div>
-                  <h1 className="text-5xl md:text-6xl font-bold tracking-tight text-white mb-3 drop-shadow-[0_5px_25px_rgba(0,0,0,0.8)] [text-shadow:_0_2px_10px_rgba(0,0,0,0.8),_0_0_30px_rgba(0,0,0,0.6)]">
-                    Land Sourcing Group
-                  </h1>
-                  <p className="text-2xl md:text-3xl text-green-200 drop-shadow-[0_5px_20px_rgba(0,0,0,0.7)] [text-shadow:_0_2px_8px_rgba(0,0,0,0.7)]">
-                    Premium US Land Acquisition Services
-                  </p>
-                </div>
-                <p className="text-lg text-green-100 max-w-2xl drop-shadow-[0_2px_10px_rgba(0,0,0,0.6)] [text-shadow:_0_1px_5px_rgba(0,0,0,0.6)]">
-                  We specialize in acquiring premium land properties across the United States,
-                  offering competitive prices and a seamless selling experience.
-                </p>
               </div>
             </div>
           </Card>
@@ -322,6 +325,37 @@ export default function Home() {
           </Card>
         </div>
       </main>
+
+      {/* Footer */}
+      <footer className="relative z-10 mt-12 bg-[#1a472a]/95 border-t border-white/10 backdrop-blur-sm">
+        <div className="max-w-6xl mx-auto px-4 py-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Contact Info */}
+            <div className="space-y-4">
+              <h3 className="text-xl font-semibold text-white">Contact Us</h3>
+              <div className="space-y-2">
+                <a href="tel:407-284-8192" className="flex items-center gap-2 text-green-200 hover:text-white transition-colors">
+                  <Phone className="h-5 w-5" />
+                  <span className="text-lg">(407) 284-8192</span>
+                </a>
+                <p className="text-green-200/80">Available Mon-Fri: 9AM-6PM EST</p>
+              </div>
+            </div>
+
+            {/* Company Info */}
+            <div className="space-y-4">
+              <h3 className="text-xl font-semibold text-white">Land Sourcing Group</h3>
+              <p className="text-green-200/80">
+                Specializing in premium land acquisition across the United States. We make selling your land simple, fast, and profitable.
+              </p>
+            </div>
+          </div>
+
+          <div className="mt-8 pt-8 border-t border-white/10 text-center text-green-200/60">
+            <p>&copy; {new Date().getFullYear()} Land Sourcing Group. All rights reserved.</p>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }
