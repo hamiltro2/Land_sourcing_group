@@ -63,14 +63,22 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
+        <link rel="icon" href="/globe.svg" type="image/svg+xml" />
         <link rel="icon" href="/favicon.ico" sizes="any" />
         <link
           rel="apple-touch-icon"
-          href="/apple-touch-icon.png"
+          href="/android-chrome-192x192.png"
           type="image/png"
-          sizes="180x180"
+          sizes="192x192"
         />
-        <link rel="manifest" href="/site.webmanifest" />
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#1a472a" />
+        <link
+          rel="preload"
+          as="image"
+          href="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Background_LandSourcing.jpg-jYmWgMHI7EuE1sKTZxqz2PFlptvwLj.jpeg"
+          fetchPriority="high"
+        />
       </head>
       <body className={inter.className}>
         {children}

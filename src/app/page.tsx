@@ -33,6 +33,7 @@ export default function Home() {
           src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Background_LandSourcing.jpg-jYmWgMHI7EuE1sKTZxqz2PFlptvwLj.jpeg"
           alt="Aerial view of green fields"
           fill
+          sizes="(max-width: 768px) 100vw, 100vw"
           className="object-cover opacity-40"
           priority
         />
@@ -73,6 +74,7 @@ export default function Home() {
                   src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Land_dots-A46GQywiVpnmwAGb1MihmEBk6c26pv.png"
                   alt="USA network map logo"
                   fill
+                  sizes="(max-width: 768px) 288px, 400px"
                   className="object-contain drop-shadow-[0_0_15px_rgba(0,0,0,0.35)]"
                   priority
                 />
@@ -96,6 +98,7 @@ export default function Home() {
                           src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Land_pin.jpg-6UxQHY3sApNOauMWgbbv3XwNODqGfz.jpeg"
                           alt="Panoramic view of location pin in sunlit grass field"
                           fill
+                          sizes="(max-width: 1024px) 100vw, 50vw"
                           className="object-cover hover:scale-105 transition-transform duration-700"
                         />
                       </div>

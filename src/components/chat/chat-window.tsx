@@ -13,7 +13,7 @@ interface Message {
   content: string
 }
 
-const INACTIVITY_TIMEOUT = 15 * 60 * 1000; // 15 minutes in milliseconds
+const INACTIVITY_TIMEOUT = 4 * 60 * 60 * 1000; // 4 hours in milliseconds
 
 export function ChatWindow() {
   const [messages, setMessages] = useState<Message[]>([
@@ -27,6 +27,7 @@ export function ChatWindow() {
   const [isExpanded, setIsExpanded] = useState(true)
   const lastActivityTime = useRef<number>(Date.now())
   const refreshTimeout = useRef<NodeJS.Timeout>()
+  const eventSource = useRef<EventSource | null>(null)
 
   // Function to check inactivity and refresh if needed
   const checkInactivity = () => {
@@ -44,8 +45,8 @@ export function ChatWindow() {
   // Set up activity monitoring
   useEffect(() => {
     // Set up periodic check for inactivity
-    refreshTimeout.current = setInterval(checkInactivity, 60000) // Check every minute
-
+    refreshTimeout.current = setInterval(checkInactivity, 60 * 1000) // Check every minute
+    
     // Set up event listeners for user activity
     const events = ['mousedown', 'keydown', 'scroll', 'touchstart']
     events.forEach(event => {
@@ -65,37 +66,51 @@ export function ChatWindow() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    const userMessage = input.trim()
-    if (!userMessage || isLoading) return
-
-    setInput("")
-    setIsLoading(true)
-    updateLastActivity()
-
-    // Add user message to chat
-    setMessages((prev) => [...prev, { role: "user", content: userMessage }])
+    if (!input.trim()) return
 
     try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
+      setInput('')
+      setIsLoading(true)
+      updateLastActivity()
+
+      // Add user message
+      const userMessage: Message = { role: "user", content: input }
+      setMessages(prev => [...prev, userMessage])
+
+      // Make the API request
+      const response = await fetch('/api/chat', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ 
-          message: userMessage,
-          messages: messages 
+        body: JSON.stringify({
+          message: input,
+          messages: [...messages, userMessage],
         }),
       })
 
-      if (!response.ok) throw new Error("Failed to get response")
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || `HTTP error! status: ${response.status}`)
+      }
 
+      // Handle the response
       const data = await response.json()
-      setMessages((prev) => [...prev, { role: "assistant", content: data.message }])
+      
+      // Add assistant message
+      const assistantMessage: Message = { 
+        role: 'assistant', 
+        content: data.choices[0].message.content 
+      }
+      setMessages(prev => [...prev, assistantMessage])
+
     } catch (error) {
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: "Sorry, I'm having trouble responding right now. Please try again." },
-      ])
+      console.error("Chat error:", error)
+      const errorMessage: Message = { 
+        role: 'assistant', 
+        content: "I apologize, but I encountered an error. Please try again or contact us at (407) 284-8192 for immediate assistance."
+      }
+      setMessages(prev => [...prev, errorMessage])
     } finally {
       setIsLoading(false)
     }
@@ -105,6 +120,14 @@ export function ChatWindow() {
     setIsExpanded(!isExpanded)
     updateLastActivity()
   }
+
+  useEffect(() => {
+    return () => {
+      if (eventSource.current) {
+        eventSource.current.close()
+      }
+    }
+  }, [])
 
   return (
     <>
@@ -145,61 +168,76 @@ export function ChatWindow() {
             isExpanded ? "opacity-100 h-[calc(350px-120px)]" : "opacity-0 h-0"
           )}>
             <div className="overflow-y-auto flex-1 space-y-4 p-4">
-              {messages.map((message, index) => (
-                <div
-                  key={index}
-                  className={cn(
-                    "flex justify-start",
-                    message.role === "user" && "justify-end"
-                  )}
-                >
+              <div className="flex flex-col space-y-4 p-4">
+                {messages.map((message, index) => (
                   <div
+                    key={index}
                     className={cn(
-                      "max-w-[80%] rounded-lg px-4 py-2",
-                      message.role === "assistant"
-                        ? "bg-green-600/10 text-green-900"
-                        : "bg-green-600 text-white"
+                      "flex w-full",
+                      message.role === "assistant" ? "justify-start" : "justify-end"
                     )}
                   >
-                    <div className={cn(
-                      "prose prose-sm",
-                      message.role === "assistant" && "prose-ul:pl-5 prose-ul:mt-2 prose-ul:space-y-1 prose-li:pl-0 prose-li:my-0",
-                      message.role === "assistant" && "prose-ol:pl-5 prose-ol:mt-2 prose-ol:space-y-1 prose-ol:list-decimal prose-li:pl-0 prose-li:my-0"
-                    )}>
-                      {message.content.split('\n').map((line, i) => {
-                        // Check for bullet points
-                        if (line.trim().startsWith('•')) {
-                          return <div key={i} className="flex items-start space-x-2 my-1">
-                            <span className="text-green-600 mt-0.5">•</span>
-                            <span>{line.trim().substring(1).trim()}</span>
-                          </div>
-                        }
-                        // Check for numbered lists (e.g., "1.", "2.", etc.)
-                        else if (/^\d+\./.test(line.trim())) {
-                          const [number, ...rest] = line.trim().split('.')
-                          return <div key={i} className="flex items-start space-x-2 my-1">
-                            <span className="text-green-600 font-semibold min-w-[1.5rem]">{number}.</span>
-                            <span>{rest.join('.').trim()}</span>
-                          </div>
-                        }
-                        // Regular text
-                        else if (line.trim()) {
-                          return <p key={i} className="my-1">{line}</p>
-                        }
-                        // Empty lines
-                        return <p key={i} className="my-2"></p>
-                      })}
+                    <div
+                      className={cn(
+                        "flex max-w-[80%] rounded-lg px-4 py-3",
+                        message.role === "assistant"
+                          ? "bg-[#2C5530]/10 text-[#2C5530] shadow-sm"
+                          : "bg-[#2C5530] text-white shadow-md"
+                      )}
+                    >
+                      <div className="whitespace-pre-wrap break-words">
+                        {message.content.split('\n').map((line, i, arr) => {
+                          // Format bullet points
+                          if (line.trim().startsWith('•')) {
+                            const isFirstBullet = !arr[i - 1]?.trim().startsWith('•')
+                            const isLastBullet = !arr[i + 1]?.trim().startsWith('•')
+                            
+                            return (
+                              <div 
+                                key={i} 
+                                className={cn(
+                                  "flex items-start",
+                                  isFirstBullet ? "mt-6" : "mt-4",
+                                  isLastBullet ? "mb-6" : "mb-4"
+                                )}
+                              >
+                                <span className={cn(
+                                  "mt-0.5 text-lg min-w-[1.5rem] flex-shrink-0",
+                                  message.role === "assistant" ? "text-[#2C5530]" : "text-white"
+                                )}>•</span>
+                                <span className="flex-1 pl-2">{line.substring(1).trim()}</span>
+                              </div>
+                            )
+                          }
+                          
+                          // Format phone numbers and other lines
+                          const formattedLine = line
+                            .replace(/\(?(\d{3})\)?[-\s]*(\d{3})[-\s]*(\d{4})/g, '<span class="font-semibold">($1) $2-$3</span>')
+                          
+                          return (
+                            <div 
+                              key={i} 
+                              className={cn(
+                                "leading-relaxed my-2",
+                                // Add spacing after paragraphs
+                                line.trim() && !arr[i + 1]?.trim() && "mb-4"
+                              )}
+                              dangerouslySetInnerHTML={{ __html: formattedLine }} 
+                            />
+                          )
+                        })}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-              {isLoading && (
-                <div className="flex justify-start">
-                  <div className="max-w-[80%] rounded-lg px-4 py-2 bg-green-600/10 text-green-900">
-                    <Spinner className="h-4 w-4" />
+                ))}
+                {isLoading && (
+                  <div className="flex justify-start">
+                    <div className="bg-[#2C5530]/10 text-[#2C5530] max-w-[80%] rounded-lg px-4 py-2">
+                      <Spinner className="h-4 w-4" />
+                    </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
             <div className="p-4 pt-0">
               <form onSubmit={handleSubmit} className="flex gap-2">
