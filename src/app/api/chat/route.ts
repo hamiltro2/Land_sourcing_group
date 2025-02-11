@@ -10,10 +10,13 @@ interface Message {
 export async function POST(req: Request) {
   try {
     // Parse the request body
+    console.log('Received chat request')
     const { message, messages }: { message: string, messages: Message[] } = await req.json()
+    console.log('Parsed request body:', { message, messageCount: messages.length })
 
     // Validate the API key
     const apiKey = process.env.OPENAI_API_KEY
+    console.log('API key configured:', !!apiKey)
     if (!apiKey) {
       console.error('OpenAI API key not configured')
       return new Response("OpenAI API key not configured", { status: 500 })
